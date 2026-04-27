@@ -5,7 +5,6 @@ pluginManagement {
     }
 }
 
-rootProject.name = "marketplace"
+rootProject.name = "lessons"
 
-includeBuild("lessons")
-includeBuild("marketplace-be")
+include("m1l1-first")
