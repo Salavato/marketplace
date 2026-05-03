@@ -16,10 +16,35 @@ services:
       SPRING_DATASOURCE_USERNAME: insurance
       SPRING_DATASOURCE_PASSWORD: insurance
       KEYCLOAK_ISSUER_URI: http://keycloak:8080/realms/insurance
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: app.logs
     depends_on:
       postgres:
         condition: service_healthy
       keycloak:
+        condition: service_healthy
+      fluent-bit:
+        condition: service_started
+
+  fluent-bit:
+    image: fluent/fluent-bit
+    container_name: fluent-bit
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
+      - "2020:2020"
+    environment:
+      - opensearch_host=opensearch
+      - opensearch_user=admin
+      - opensearch_pass=adm-Password0
+    volumes:
+      - ./volumes/fluent-bit-etc/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
+      - ./volumes/fluent-bit-etc/parsers.conf:/fluent-bit/etc/parsers.conf
+    depends_on:
+      opensearch:
         condition: service_healthy
 
   postgres:
