@@ -18,6 +18,13 @@ pluginManagement {
         mavenCentral()
         gradlePluginPortal()
     }
+    resolutionStrategy {
+        eachPlugin {
+            if (requested.id.id == "org.openapi.generator") {
+                useModule("org.openapitools:openapi-generator-gradle-plugin:${requested.version}")
+            }
+        }
+    }
 }
 
 plugins {
@@ -25,3 +32,7 @@ plugins {
 }
 
 include("test-module")
+include("marketplace-specs")
+include("marketplace-api-v1-jackson")
+include("marketplace-common")
+include("marketplace-api-v1-mappers")

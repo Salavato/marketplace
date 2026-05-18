@@ -30,7 +30,7 @@
 Методы: сами продукты будут заполняться админом напрямую в БД через скрипт миграции.
 
 **Deal (Сделка)** — факт оформления страхового продукта покупателем по конкретному заказу.
-Методы: Создание сделки, отмена сделки
+Методы: Создание сделки, отмена сделки, чтение сделки, Поиск сделки
 
 ---
 
@@ -60,3 +60,16 @@ docker compose up --build
 | Приложение | http://localhost:8080 |
 | Keycloak | http://localhost:8180 |
 | OpenSearch Dashboards | http://localhost:5601 |
+
+---
+
+## Просмотр API-спецификации (Swagger UI)
+
+```bash
+docker run -p 8081:8080 \
+  -e SWAGGER_JSON=/spec/specs-v1.yaml \
+  -v $(pwd)/marketplace-be/marketplace-specs/specs:/spec \
+  swaggerapi/swagger-ui
+```
+
+Открыть: http://localhost:8081

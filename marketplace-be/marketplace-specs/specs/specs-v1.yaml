@@ -1,0 +1,313 @@
+openapi: 3.0.3
+info:
+  title: "Insurance API"
+  description: Сервис оформления страховых продуктов при покупке товаров на маркетплейсе
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/v1
+tags:
+  - name: deal
+    description: Страховая сделка
+  - name: product
+    description: Страховой продукт
+paths:
+  /deal/create:
+    post:
+      tags:
+        - deal
+      summary: Create deal
+      operationId: dealCreate
+      requestBody:
+        description: Request body
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DealCreateRequest'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DealCreateResponse'
+  /deal/cancel:
+    post:
+      tags:
+        - deal
+      summary: Cancel deal
+      operationId: dealCancel
+      requestBody:
+        description: Request body
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DealCancelRequest'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DealCancelResponse'
+  /deal/read:
+    post:
+      tags:
+        - deal
+      summary: Read deal
+      operationId: dealRead
+      requestBody:
+        description: Request body
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DealReadRequest'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DealReadResponse'
+  /deal/search:
+    post:
+      tags:
+        - deal
+      summary: Search deals
+      operationId: dealSearch
+      requestBody:
+        description: Request body
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DealSearchRequest'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DealSearchResponse'
+  /product/list:
+    post:
+      tags:
+        - product
+      summary: List insurance products
+      operationId: productList
+      requestBody:
+        description: Request body
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductListRequest'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductListResponse'
+
+components:
+  schemas:
+
+    IRequest:
+      type: object
+      description: Базовый интерфейс для всех запросов
+      properties:
+        requestType:
+          type: string
+          description: Дискриминатор типа запроса
+          example: dealCreate
+      discriminator:
+        propertyName: requestType
+        mapping:
+          dealCreate: '#/components/schemas/DealCreateRequest'
+          dealCancel: '#/components/schemas/DealCancelRequest'
+          dealRead: '#/components/schemas/DealReadRequest'
+          dealSearch: '#/components/schemas/DealSearchRequest'
+          productList: '#/components/schemas/ProductListRequest'
+
+    IResponse:
+      type: object
+      description: Базовый интерфейс для всех ответов
+      properties:
+        responseType:
+          type: string
+          description: Дискриминатор типа ответа
+          example: dealCreate
+        result:
+          $ref: '#/components/schemas/ResponseResult'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
+      discriminator:
+        propertyName: responseType
+        mapping:
+          dealCreate: '#/components/schemas/DealCreateResponse'
+          dealCancel: '#/components/schemas/DealCancelResponse'
+          dealRead: '#/components/schemas/DealReadResponse'
+          dealSearch: '#/components/schemas/DealSearchResponse'
+          productList: '#/components/schemas/ProductListResponse'
+
+    ResponseResult:
+      type: string
+      enum:
+        - success
+        - error
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Код ошибки
+        message:
+          type: string
+          description: Описание ошибки
+
+    DealStatus:
+      type: string
+      description: Статус страховой сделки
+      enum:
+        - new
+        - paidProgress
+        - paid
+        - notPaid
+        - cancelled
+        - claimed
+
+    DealObject:
+      type: object
+      description: Страховая сделка
+      properties:
+        id:
+          type: string
+          description: Идентификатор сделки
+        productId:
+          type: string
+          description: Идентификатор страхового продукта
+        userId:
+          type: string
+          description: Идентификатор покупателя
+        orderId:
+          type: string
+          description: Идентификатор заказа на маркетплейсе
+        status:
+          $ref: '#/components/schemas/DealStatus'
+
+    InsuranceProductObject:
+      type: object
+      description: Страховой продукт
+      properties:
+        id:
+          type: string
+          description: Идентификатор страхового продукта
+        name:
+          type: string
+          description: Название страхового продукта
+        description:
+          type: string
+          description: Описание условий страхования
+        price:
+          type: number
+          format: double
+          description: Стоимость страхового продукта
+
+    DealCreateRequest:
+      allOf:
+        - $ref: '#/components/schemas/IRequest'
+        - type: object
+          properties:
+            deal:
+              $ref: '#/components/schemas/DealObject'
+
+    DealCreateResponse:
+      allOf:
+        - $ref: '#/components/schemas/IResponse'
+        - type: object
+          properties:
+            deal:
+              $ref: '#/components/schemas/DealObject'
+
+    DealCancelRequest:
+      allOf:
+        - $ref: '#/components/schemas/IRequest'
+        - type: object
+          properties:
+            dealId:
+              type: string
+
+    DealCancelResponse:
+      allOf:
+        - $ref: '#/components/schemas/IResponse'
+        - type: object
+          properties:
+            deal:
+              $ref: '#/components/schemas/DealObject'
+
+    DealReadRequest:
+      allOf:
+        - $ref: '#/components/schemas/IRequest'
+        - type: object
+          properties:
+            dealId:
+              type: string
+
+    DealReadResponse:
+      allOf:
+        - $ref: '#/components/schemas/IResponse'
+        - type: object
+          properties:
+            deal:
+              $ref: '#/components/schemas/DealObject'
+
+    DealSearchFilter:
+      type: object
+      description: Фильтр для поиска сделок
+      properties:
+        userId:
+          type: string
+          description: Фильтр по идентификатору покупателя
+        status:
+          $ref: '#/components/schemas/DealStatus'
+
+    DealSearchRequest:
+      allOf:
+        - $ref: '#/components/schemas/IRequest'
+        - type: object
+          properties:
+            filter:
+              $ref: '#/components/schemas/DealSearchFilter'
+
+    DealSearchResponse:
+      allOf:
+        - $ref: '#/components/schemas/IResponse'
+        - type: object
+          properties:
+            deals:
+              type: array
+              items:
+                $ref: '#/components/schemas/DealObject'
+
+    ProductListRequest:
+      allOf:
+        - $ref: '#/components/schemas/IRequest'
+
+    ProductListResponse:
+      allOf:
+        - $ref: '#/components/schemas/IResponse'
+        - type: object
+          properties:
+            products:
+              type: array
+              items:
+                $ref: '#/components/schemas/InsuranceProductObject'
